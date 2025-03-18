@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // For Clipboard
+import 'package:fluttertoast/fluttertoast.dart';
 import '../model/quote.dart';
 
 class QuoteCard extends StatelessWidget {
@@ -29,9 +31,7 @@ class QuoteCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16.0),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       elevation: 2.0,
       color: Colors.grey[200],
       child: Padding(
@@ -52,18 +52,21 @@ class QuoteCard extends StatelessWidget {
             // Date
             Text(
               data.datePublication.split('-').reversed.join('.'),
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 12.0,
-              ),
+              style: TextStyle(color: Colors.grey[600], fontSize: 12.0),
             ),
             const SizedBox(height: 8.0),
             // Quote
-            Text(
-              data.quote,
-              style: const TextStyle(
-                fontSize: 16.0,
-              ),
+            GestureDetector(
+              onLongPress: () {
+                Clipboard.setData(
+                  ClipboardData(
+                    text: '${data.quote}\n\n© ${data.teacher.fullname}',
+                  ),
+                );
+                Fluttertoast.showToast(msg: 'Цитата скопирована');
+                HapticFeedback.vibrate();
+              },
+              child: Text(data.quote, style: const TextStyle(fontSize: 16.0)),
             ),
             const SizedBox(height: 8.0),
             // Reactions and views

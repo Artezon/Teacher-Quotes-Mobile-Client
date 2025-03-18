@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/services.dart';
 import '../styles/theme.dart';
@@ -14,9 +15,7 @@ class FacultyInfoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       // extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: Text(title),
-      ),
+      appBar: AppBar(title: Text(title)),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -252,11 +251,6 @@ class FacultyInfoPage extends StatelessWidget {
 
   void _copyWithSnackbar(BuildContext context, String text) {
     Clipboard.setData(ClipboardData(text: text));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Скопировано: $text'),
-        duration: const Duration(seconds: 1),
-      ),
-    );
+    Fluttertoast.showToast(msg: 'Скопировано: $text');
   }
 }

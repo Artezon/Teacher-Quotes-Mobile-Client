@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../api_data.dart';
 import '../model/filter_state.dart';
-import '../model/quote.dart';
 import '../model/quote_response.dart';
 import '../widgets/quote_card.dart';
 import '../widgets/filter_modal.dart';
@@ -25,7 +24,6 @@ class _FeedPageState extends State<FeedPage> {
   bool _isLoadingMore = false; // Whether more data is being loaded
   static bool _endReached = false; // Whether there are no more quotes to load
   static bool _errorInfiniteScroll = false;
-  final ScrollController _scrollController = ScrollController();
 
   FilterState _filters = FilterState();
 
@@ -41,22 +39,6 @@ class _FeedPageState extends State<FeedPage> {
       );
     } else {
       _quoteResponseFuture = Future.value(_cachedResponse);
-    }
-
-    _scrollController.addListener(_onScroll);
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose(); // Clean up the controller
-    super.dispose();
-  }
-
-  void _onScroll() {
-    if (_scrollController.position.pixels ==
-            _scrollController.position.maxScrollExtent &&
-        !_isLoadingMore) {
-      _loadMoreQuotes();
     }
   }
 
@@ -133,9 +115,6 @@ class _FeedPageState extends State<FeedPage> {
       setState(() {
         _errorInfiniteScroll = true;
       });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Ошибка загрузки: $e')));
     } finally {
       setState(() {
         _isLoadingMore = false;
@@ -244,55 +223,69 @@ class _FeedPageState extends State<FeedPage> {
                 ),
               );
             } else {
-              return ListView.builder(
-                controller: _scrollController,
-                padding: const EdgeInsets.all(16.0),
-                itemCount: snapshot.data!.content.length + 1,
-                itemBuilder: (context, index) {
-                  if (index < snapshot.data!.content.length) {
-                    return QuoteCard(data: snapshot.data!.content[index]);
-                  } else {
-                    return Padding(
+              return Scrollbar(
+                thickness: 5.0,
+                child: CustomScrollView(
+                  physics: AlwaysScrollableScrollPhysics(),
+                  slivers: [
+                    SliverPadding(
                       padding: const EdgeInsets.all(16.0),
-                      child: Center(
-                        child: Builder(
-                          builder: (context) {
-                            if (_endReached) {
-                              final all_viewed = Text(
-                                'Вы всё посмотрели',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey,
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                          if (index < snapshot.data!.content.length) {
+                            return QuoteCard(
+                              data: snapshot.data!.content[index],
+                            );
+                          } else {
+                            return Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Center(
+                                child: Builder(
+                                  builder: (context) {
+                                    if (_endReached) {
+                                      final all_viewed = Text(
+                                        'Вы всё посмотрели',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.grey,
+                                        ),
+                                      );
+                                      if (_filters.isFilterApplied()) {
+                                        return Column(
+                                          children: [
+                                            all_viewed,
+                                            SizedBox(height: 16),
+                                            ElevatedButton(
+                                              onPressed: _resetFilters,
+                                              child: Text('Сбросить фильтры'),
+                                            ),
+                                          ],
+                                        );
+                                      } else {
+                                        return all_viewed;
+                                      }
+                                    } else if (_errorInfiniteScroll) {
+                                      return ElevatedButton(
+                                        onPressed: _loadMoreQuotes,
+                                        child: Text('Загрузить ещё цитаты'),
+                                      );
+                                    } else {
+                                      WidgetsBinding.instance
+                                          .addPostFrameCallback((_) {
+                                            _loadMoreQuotes();
+                                          });
+                                      return CircularProgressIndicator();
+                                    }
+                                  },
                                 ),
-                              );
-                              if (_filters.isFilterApplied()) {
-                                return Column(
-                                  children: [
-                                    all_viewed,
-                                    SizedBox(height: 16),
-                                    ElevatedButton(
-                                      onPressed: _resetFilters,
-                                      child: Text('Сбросить фильтры'),
-                                    ),
-                                  ],
-                                );
-                              } else {
-                                return all_viewed;
-                              }
-                            } else if (_errorInfiniteScroll) {
-                              return ElevatedButton(
-                                onPressed: _onRefresh,
-                                child: Text('Загрузить ещё цитаты'),
-                              );
-                            } else {
-                              return CircularProgressIndicator();
-                            }
-                          },
-                        ),
+                              ),
+                            );
+                          }
+                        }, childCount: snapshot.data!.content.length + 1),
                       ),
-                    );
-                  }
-                },
+                    ),
+                  ],
+                ),
               );
             }
           },
