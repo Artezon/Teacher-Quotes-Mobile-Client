@@ -1,2 +1,4 @@
-String base_url = "https://api.qa.tw1.ru";
-String get_quotes = "/api/quotes";
+String baseUrl = "https://api.qa.tw1.ru";
+String getQuotes = "/api/quotes";
+String getFaculties = "/api/faculties";
+String getTeachers = "/api/teachers";

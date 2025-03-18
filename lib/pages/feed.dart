@@ -54,7 +54,7 @@ class _FeedPageState extends State<FeedPage> {
     queryParams.addAll(filters);
 
     final response = await http.get(
-      Uri.parse('$base_url$get_quotes').replace(queryParameters: queryParams),
+      Uri.parse('$baseUrl$getQuotes').replace(queryParameters: queryParams),
     );
 
     if (response.statusCode == 200) {

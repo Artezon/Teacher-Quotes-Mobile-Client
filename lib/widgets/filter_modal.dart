@@ -66,16 +66,28 @@ class _FilterModalState extends State<FilterModal> {
               decoration: InputDecoration(labelText: 'Ключевые слова'),
             ),
             SizedBox(height: 8),
-            TextFormField(
-              initialValue: _faculty,
-              onChanged: (value) => setState(() => _faculty = value),
+            DropdownButtonFormField<String>(
+              value: _faculty.isNotEmpty ? _faculty : null,
               decoration: InputDecoration(labelText: 'Факультет'),
+              items: FilterState.allFaculties?.keys.map((facultyName) {
+                return DropdownMenuItem(
+                  value: facultyName,
+                  child: Text(facultyName),
+                );
+              }).toList(),
+              onChanged: (value) => setState(() => _faculty = value ?? ''),
             ),
             SizedBox(height: 8),
-            TextFormField(
-              initialValue: _teacher,
-              onChanged: (value) => setState(() => _teacher = value),
+            DropdownButtonFormField<String>(
+              value: _teacher.isNotEmpty ? _teacher : null,
               decoration: InputDecoration(labelText: 'Преподаватель'),
+              items: FilterState.allTeachers?.keys.map((teacherName) {
+                return DropdownMenuItem(
+                  value: teacherName,
+                  child: Text(teacherName),
+                );
+              }).toList(),
+              onChanged: (value) => setState(() => _teacher = value ?? ''),
             ),
             SizedBox(height: 24),
             Row(
@@ -100,11 +112,11 @@ class _FilterModalState extends State<FilterModal> {
                       ),
                       child: Text(
                         _startDate
-                                ?.toString()
-                                .split(' ')[0]
-                                .split('-')
-                                .reversed
-                                .join('.') ??
+                            ?.toString()
+                            .split(' ')[0]
+                            .split('-')
+                            .reversed
+                            .join('.') ??
                             'С начала времён',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -133,11 +145,11 @@ class _FilterModalState extends State<FilterModal> {
                       ),
                       child: Text(
                         _endDate
-                                ?.toString()
-                                .split(' ')[0]
-                                .split('-')
-                                .reversed
-                                .join('.') ??
+                            ?.toString()
+                            .split(' ')[0]
+                            .split('-')
+                            .reversed
+                            .join('.') ??
                             'До сегодня',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -151,22 +163,16 @@ class _FilterModalState extends State<FilterModal> {
             DropdownButtonFormField<String>(
               value: _selectedSorting,
               decoration: InputDecoration(labelText: 'Сортировка'),
-              items:
-                  FilterModal.sortingOptionsStrings.entries
-                      .map(
-                        (option) => DropdownMenuItem(
-                          value: option.key,
-                          child: Text(option.value),
-                        ),
-                      )
-                      .toList(),
-              onChanged:
-                  (value) => setState(
-                    () =>
-                        _selectedSorting =
-                            value ??
-                            FilterModal.sortingOptionsStrings.keys.first,
-                  ),
+              items: FilterModal.sortingOptionsStrings.entries
+                  .map(
+                    (option) => DropdownMenuItem(
+                  value: option.key,
+                  child: Text(option.value),
+                ),
+              )
+                  .toList(),
+              onChanged: (value) =>
+                  setState(() => _selectedSorting = value ?? FilterModal.sortingOptionsStrings.keys.first),
             ),
           ],
         ),
@@ -174,45 +180,42 @@ class _FilterModalState extends State<FilterModal> {
       actions: [
         Column(
           mainAxisSize: MainAxisSize.min,
-          // Ensure the column takes minimal space
           children: [
-            // First Row: Сбросить даты | Сбросить всё
             Row(
               children: [
                 Expanded(
                   child: TextButton(
                     onPressed: () {
                       setState(() {
-                        _startDate = null; // Reset start date
-                        _endDate = null; // Reset end date
+                        _startDate = null;
+                        _endDate = null;
                       });
                     },
                     child: Text('Сбросить даты'),
                   ),
                 ),
-                SizedBox(width: 8), // Add spacing between buttons
+                SizedBox(width: 8),
                 Expanded(
                   child: TextButton(
-                    onPressed: _resetFilters, // Reset all filters
+                    onPressed: _resetFilters,
                     child: Text('Сбросить всё'),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 8), // Add spacing between rows
-            // Second Row: Отмена | Применить
+            SizedBox(height: 8),
             Row(
               children: [
                 Expanded(
                   child: TextButton(
-                    onPressed: () => Navigator.pop(context), // Cancel
+                    onPressed: () => Navigator.pop(context),
                     child: Text('Отмена'),
                   ),
                 ),
-                SizedBox(width: 8), // Add spacing between buttons
+                SizedBox(width: 8),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () => _applyFilters(context), // Apply filters
+                    onPressed: () => _applyFilters(context),
                     child: Text('Применить'),
                   ),
                 ),
