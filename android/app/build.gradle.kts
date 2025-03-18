@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "me.artezon.mq_mobile_quotes"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973" // old value: flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

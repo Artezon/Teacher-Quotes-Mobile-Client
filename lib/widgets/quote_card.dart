@@ -1,39 +1,28 @@
 import 'package:flutter/material.dart';
+import '../model/quote.dart';
 
 class QuoteCard extends StatelessWidget {
-  final Map<String, dynamic> data;
+  final Quote data;
 
   const QuoteCard({super.key, required this.data});
 
   // Helper function to format the author and subject line
   String _formatAuthorSubjectLine() {
-    final author = data['author'] as Map<String, dynamic>?;
-    final faculty = data['faculty'] as String?;
-    final subject = data['subject'] as String?;
+    String faculty = data.faculty.name;
+    String teacher = data.teacher.fullname;
+    String subject = data.subject.name;
 
-    String authorName = 'Неизвестный автор';
-    if (author != null) {
-      final surname = author['surname'] as String? ?? '';
-      final name = author['name'] as String? ?? '';
-      final patronym = author['patronym'] as String? ?? '';
+    faculty = faculty.replaceAll('_', ' ');
+    faculty = "${faculty[0].toUpperCase()}${faculty.substring(1)}";
+    faculty = faculty.replaceAll("кубгу", "КубГУ");
 
-      if (surname.isNotEmpty && name.isNotEmpty) {
-        authorName = '$surname ${name[0]}.';
-        if (patronym.isNotEmpty) {
-          authorName += ' ${patronym[0]}.';
-        }
-      }
+    List<String> line = [];
+    line.add(faculty.isNotEmpty ? faculty : 'Неизвестный факультет');
+    line.add(teacher.isNotEmpty ? teacher : 'Аноним');
+    if (subject.isNotEmpty) {
+      line.add(subject);
     }
-
-    final facultyText = faculty?.isNotEmpty ?? false
-        ? faculty!
-        : 'Неизвестный факультет';
-
-    final subjectText = subject?.isNotEmpty ?? false
-        ? ' • $subject'
-        : '';
-
-    return '$facultyText • $authorName$subjectText';
+    return line.join(' • ');
   }
 
   @override
@@ -62,7 +51,7 @@ class QuoteCard extends StatelessWidget {
             const SizedBox(height: 8.0),
             // Date
             Text(
-              data['date'].split('-').reversed.join('.'),
+              data.datePublication.split('-').reversed.join('.'),
               style: TextStyle(
                 color: Colors.grey[600],
                 fontSize: 12.0,
@@ -71,22 +60,22 @@ class QuoteCard extends StatelessWidget {
             const SizedBox(height: 8.0),
             // Quote
             Text(
-              data['text'],
+              data.quote,
               style: const TextStyle(
                 fontSize: 16.0,
               ),
             ),
             const SizedBox(height: 8.0),
-            // Likes and Views
+            // Reactions and views
             Row(
               children: [
                 Icon(Icons.star, size: 16.0, color: Colors.amber),
                 const SizedBox(width: 4.0),
-                Text(data['likes'].toString()),
+                Text(data.reactions.toString()),
                 const SizedBox(width: 16.0),
                 Icon(Icons.remove_red_eye, size: 16.0, color: Colors.grey),
                 const SizedBox(width: 4.0),
-                Text(data['views'].toString()),
+                Text(data.views.toString()),
               ],
             ),
           ],

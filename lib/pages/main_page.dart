@@ -23,7 +23,16 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
-        body: _pageOptions[selectedPage],
+        body: AnimatedSwitcher(
+          duration: Duration(milliseconds: 150), // Animation duration
+          transitionBuilder: (Widget child, Animation<double> animation) {
+            return FadeTransition(
+              opacity: animation,
+              child: child,
+            );
+          },
+          child: _pageOptions[selectedPage], // The current page
+        ),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: selectedPage,
           onTap: (index) {
