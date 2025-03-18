@@ -2,8 +2,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../api_data.dart';
+import '../model/filter_state.dart';
+import '../model/quote.dart';
 import '../model/quote_response.dart';
 import '../widgets/quote_card.dart';
+import '../widgets/filter_modal.dart';
 
 class FeedPage extends StatefulWidget {
   const FeedPage({super.key});
@@ -24,12 +27,18 @@ class _FeedPageState extends State<FeedPage> {
   static bool _errorInfiniteScroll = false;
   final ScrollController _scrollController = ScrollController();
 
+  FilterState _filters = FilterState();
+
   @override
   void initState() {
     super.initState();
 
     if (_cachedResponse == null) {
-      _quoteResponseFuture = _fetchQuotes(_currentPage, _pageSize);
+      _quoteResponseFuture = _fetchQuotes(
+        _currentPage,
+        _pageSize,
+        _filters.toQueryParameters(),
+      );
     } else {
       _quoteResponseFuture = Future.value(_cachedResponse);
     }
@@ -45,15 +54,25 @@ class _FeedPageState extends State<FeedPage> {
 
   void _onScroll() {
     if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent &&
+            _scrollController.position.maxScrollExtent &&
         !_isLoadingMore) {
       _loadMoreQuotes();
     }
   }
 
-  Future<QuoteResponse> _fetchQuotes(int page, int size) async {
+  Future<QuoteResponse> _fetchQuotes(
+    int page,
+    int size,
+    Map<String, String> filters,
+  ) async {
+    Map<String, String> queryParams = {
+      'page': page.toString(),
+      'size': size.toString(),
+    };
+    queryParams.addAll(filters);
+
     final response = await http.get(
-      Uri.parse('$base_url$get_quotes?$page_param$page&$size_param$size'),
+      Uri.parse('$base_url$get_quotes').replace(queryParameters: queryParams),
     );
 
     if (response.statusCode == 200) {
@@ -81,7 +100,11 @@ class _FeedPageState extends State<FeedPage> {
       _cachedResponse = null;
       _currentPage = 1;
       _endReached = false;
-      _quoteResponseFuture = _fetchQuotes(_currentPage, _pageSize);
+      _quoteResponseFuture = _fetchQuotes(
+        _currentPage,
+        _pageSize,
+        _filters.toQueryParameters(),
+      );
     });
   }
 
@@ -95,7 +118,7 @@ class _FeedPageState extends State<FeedPage> {
     try {
       final oldQuoteCount = _cachedResponse?.content.length;
       final nextPage = _currentPage + 1;
-      await _fetchQuotes(nextPage, _pageSize);
+      await _fetchQuotes(nextPage, _pageSize, _filters.toQueryParameters());
       final newQuoteCount = _cachedResponse?.content.length;
 
       setState(() {
@@ -106,9 +129,6 @@ class _FeedPageState extends State<FeedPage> {
           _endReached = true;
         }
       });
-      setState(() {
-        _isLoadingMore = false;
-      });
     } catch (e) {
       setState(() {
         _errorInfiniteScroll = true;
@@ -117,10 +137,31 @@ class _FeedPageState extends State<FeedPage> {
         context,
       ).showSnackBar(SnackBar(content: Text('Ошибка загрузки: $e')));
     } finally {
-      // setState(() {
-      //   _isLoadingMore = false;
-      // });
+      setState(() {
+        _isLoadingMore = false;
+      });
     }
+  }
+
+  void _openFilterModal() async {
+    final result = await showDialog<FilterState>(
+      context: context,
+      builder: (context) => FilterModal(currentFilters: _filters),
+    );
+
+    if (result != null) {
+      setState(() {
+        _filters = result;
+      });
+      _onRefresh();
+    }
+  }
+
+  void _resetFilters() {
+    setState(() {
+      _filters = FilterState();
+    });
+    _onRefresh();
   }
 
   @override
@@ -130,7 +171,7 @@ class _FeedPageState extends State<FeedPage> {
         title: Text(title),
         actions: [
           TextButton(
-            onPressed: () {},
+            onPressed: _openFilterModal,
             child: Text(
               'Фильтры',
               style: TextStyle(
@@ -163,10 +204,7 @@ class _FeedPageState extends State<FeedPage> {
                     Text(
                       'Не удалось подключиться к серверу :(',
                       // 'Не удалось подключиться к серверу :(\n${snapshot.error}\n${snapshot.stackTrace}',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey,
-                      ),
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
                     ),
                     SizedBox(height: 20), // Add spacing between text and button
                     ElevatedButton(
@@ -177,7 +215,34 @@ class _FeedPageState extends State<FeedPage> {
                 ),
               );
             } else if (!snapshot.hasData || snapshot.data!.content.isEmpty) {
-              return Center(child: Text('Нет цитат'));
+              return Center(
+                child: Builder(
+                  builder: (context) {
+                    final no_quotes = Text(
+                      'Нет цитат',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    );
+                    if (_filters.isFilterApplied()) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          no_quotes,
+                          SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: _resetFilters,
+                            child: Text('Сбросить фильтры'),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return no_quotes;
+                    }
+                  },
+                ),
+              );
             } else {
               return ListView.builder(
                 controller: _scrollController,
@@ -193,13 +258,27 @@ class _FeedPageState extends State<FeedPage> {
                         child: Builder(
                           builder: (context) {
                             if (_endReached) {
-                              return Text(
-                                'Вы всё посмотрели (добавить сюда кнопку сбросить фильтры если они включены)',
+                              final all_viewed = Text(
+                                'Вы всё посмотрели',
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Colors.grey,
                                 ),
                               );
+                              if (_filters.isFilterApplied()) {
+                                return Column(
+                                  children: [
+                                    all_viewed,
+                                    SizedBox(height: 16),
+                                    ElevatedButton(
+                                      onPressed: _resetFilters,
+                                      child: Text('Сбросить фильтры'),
+                                    ),
+                                  ],
+                                );
+                              } else {
+                                return all_viewed;
+                              }
                             } else if (_errorInfiniteScroll) {
                               return ElevatedButton(
                                 onPressed: _onRefresh,
