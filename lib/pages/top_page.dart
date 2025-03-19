@@ -1,13 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart' as http;
-import '../api_data.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter/services.dart';
-import '../styles/theme.dart';
-
-enum ContentType { faculty, teacher }
+import '../widgets/leaderboard_table.dart';
 
 class TopPage extends StatefulWidget {
   const TopPage({super.key});
@@ -17,14 +9,86 @@ class TopPage extends StatefulWidget {
 }
 
 class _TopPageState extends State<TopPage> {
+  final List<String> contentTypes = ['Преподаватели', 'Факультеты'];
+  final List<String> timePeriods = ['Неделя', 'Месяц', 'Год', 'Всё время'];
+
+  String _title = 'Топ преподавателей';
+
+  String? selectedContentType;
+  String? selectedTimePeriod;
+
+  @override
+  void initState() {
+    super.initState();
+
+    selectedContentType = contentTypes[0];
+    selectedTimePeriod = timePeriods[0];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Топ')),
-      body: Center(
-        child: Text(
-          'В разработке 😭',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      appBar: AppBar(title: Text(_title)),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                // First Dropdown for Content Type
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    value: selectedContentType,
+                    items:
+                        contentTypes.map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedContentType = newValue;
+                      });
+                    },
+                    decoration: InputDecoration(border: OutlineInputBorder()),
+                  ),
+                ),
+                SizedBox(width: 10), // Add some spacing between the dropdowns
+                // Second Dropdown for Time Period
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    value: selectedTimePeriod,
+                    items:
+                        timePeriods.map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedTimePeriod = newValue;
+                      });
+                    },
+                    decoration: InputDecoration(border: OutlineInputBorder()),
+                  ),
+                ),
+              ],
+            ),
+
+            SizedBox(height: 20),
+
+            // Table Widget
+            Expanded(
+              child: LeaderboardTable(
+                nameColumnTitle:
+                    selectedContentType == 'Преподаватели'
+                        ? 'Преподаватель'
+                        : 'Факультет',
+              ),
+            ),
+          ],
         ),
       ),
     );

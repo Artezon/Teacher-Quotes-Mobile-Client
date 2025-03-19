@@ -7,7 +7,6 @@ import '../api_data.dart';
 import 'package:flutter/services.dart';
 import '../model/filter_state.dart';
 import '../styles/theme.dart';
-import 'main_page.dart';
 
 enum ContentType { faculty, teacher }
 

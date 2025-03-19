@@ -10,7 +10,7 @@ class GenerationCard extends StatelessWidget {
   final VoidCallback onRemove;
 
   static const disclaimer =
-      '\n__________\n\nСодержимое сгенерировано ИИ и не является реальной цитатой.';
+      '\n--------------------\nСодержимое сгенерировано ИИ и не является реальной цитатой.';
 
   const GenerationCard({
     super.key,
