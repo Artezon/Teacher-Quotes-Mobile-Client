@@ -49,19 +49,7 @@ class _MainPageState extends State<MainPage> {
       onWillPop: _onWillPop,
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: IndexedStack(
-          index: selectedPage,
-          children: _navigatorKeys.map((key) {
-            return Navigator(
-              key: key,
-              onGenerateRoute: (RouteSettings settings) {
-                return MaterialPageRoute(
-                  builder: (context) => _pageOptions[_navigatorKeys.indexOf(key)],
-                );
-              },
-            );
-          }).toList(),
-        ),
+        body: _buildPage(selectedPage),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: selectedPage,
           onTap: (index) {
@@ -95,6 +83,17 @@ class _MainPageState extends State<MainPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildPage(int index) {
+    return Navigator(
+      key: _navigatorKeys[index],
+      onGenerateRoute: (RouteSettings settings) {
+        return MaterialPageRoute(
+          builder: (context) => _pageOptions[index],
+        );
+      },
     );
   }
 }

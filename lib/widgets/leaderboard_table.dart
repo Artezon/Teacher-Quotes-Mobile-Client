@@ -2,18 +2,13 @@ import 'package:flutter/material.dart';
 
 class LeaderboardTable extends StatelessWidget {
   final String nameColumnTitle;
+  final List<Map<String, dynamic>> data;
 
-  static const List<Map<String, dynamic>> data = [
-    {'name': 'Иванов И.И.', 'score': 1000},
-    {'name': 'Петров П.П.', 'score': 950},
-    {'name': 'Сидоров С.С.', 'score': 900},
-    {'name': 'Орлов О.О.', 'score': 850},
-    {'name': 'Кузнецов К.К.', 'score': 800},
-    {'name': 'Лебедев Л.Л.', 'score': 750},
-    {'name': 'Зайцев З.З.', 'score': 700},
-  ];
-
-  const LeaderboardTable({super.key, required this.nameColumnTitle});
+  const LeaderboardTable({
+    super.key,
+    required this.nameColumnTitle,
+    required this.data,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,9 +17,7 @@ class LeaderboardTable extends StatelessWidget {
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: constraints.maxWidth, // Ensure the table doesn't exceed screen width
-            ),
+            constraints: BoxConstraints(maxWidth: constraints.maxWidth),
             child: Table(
               border: TableBorder.all(color: Colors.grey),
               columnWidths: {
@@ -44,8 +37,10 @@ class LeaderboardTable extends StatelessWidget {
                 for (int i = 0; i < data.length; i++) ...[
                   TableRow(
                     children: [
-                      if (i < 3) _buildPlaceNumber(i + 1)
-                      else _buildTableCell(Text((i + 1).toString())),
+                      if (i < 3)
+                        _buildPlaceNumber(i + 1)
+                      else
+                        _buildTableCell(Text((i + 1).toString())),
                       _buildTableCell(Text(data[i]['name'])),
                       _buildTableCell(Text(data[i]['score'].toString())),
                     ],
@@ -59,7 +54,10 @@ class LeaderboardTable extends StatelessWidget {
     );
   }
 
-  Widget _buildTableCell(Widget child, {Alignment alignment = Alignment.center}) {
+  Widget _buildTableCell(
+    Widget child, {
+    Alignment alignment = Alignment.center,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
       alignment: alignment,
@@ -70,10 +68,7 @@ class LeaderboardTable extends StatelessWidget {
   Widget _buildHeaderText(String text) {
     return Text(
       text,
-      style: TextStyle(
-        fontWeight: FontWeight.bold,
-        fontSize: 14,
-      ),
+      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
     );
   }
 
