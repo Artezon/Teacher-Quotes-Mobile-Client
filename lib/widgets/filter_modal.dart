@@ -66,28 +66,82 @@ class _FilterModalState extends State<FilterModal> {
               decoration: InputDecoration(labelText: 'Ключевые слова'),
             ),
             SizedBox(height: 8),
-            DropdownButtonFormField<String>(
-              value: _faculty.isNotEmpty ? _faculty : null,
-              decoration: InputDecoration(labelText: 'Факультет'),
-              items: FilterState.allFaculties?.keys.map((facultyName) {
-                return DropdownMenuItem(
-                  value: facultyName,
-                  child: Text(facultyName),
-                );
-              }).toList(),
-              onChanged: (value) => setState(() => _faculty = value ?? ''),
+            // Faculty Dropdown with Loading State
+            FutureBuilder<Map<String, int>?>(
+              future: FilterState.allFaculties != null
+                  ? Future.value(FilterState.allFaculties)
+                  : FilterState.fetchAllFaculties(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      labelText: 'Факультет (загрузка списка...)',
+                    ),
+                    items: [], // No items while loading
+                    onChanged: null, // Disable interaction
+                  );
+                } else if (snapshot.hasError) {
+                  return DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      labelText: 'Факультет (ошибка загрузки)',
+                    ),
+                    items: [], // No items on error
+                    onChanged: null, // Disable interaction
+                  );
+                } else {
+                  final faculties = snapshot.data!;
+                  return DropdownButtonFormField<String>(
+                    value: _faculty.isNotEmpty ? _faculty : null,
+                    decoration: InputDecoration(labelText: 'Факультет'),
+                    items: faculties.keys.map((facultyName) {
+                      return DropdownMenuItem(
+                        value: facultyName,
+                        child: Text(facultyName),
+                      );
+                    }).toList(),
+                    onChanged: (value) => setState(() => _faculty = value ?? ''),
+                  );
+                }
+              },
             ),
             SizedBox(height: 8),
-            DropdownButtonFormField<String>(
-              value: _teacher.isNotEmpty ? _teacher : null,
-              decoration: InputDecoration(labelText: 'Преподаватель'),
-              items: FilterState.allTeachers?.keys.map((teacherName) {
-                return DropdownMenuItem(
-                  value: teacherName,
-                  child: Text(teacherName),
-                );
-              }).toList(),
-              onChanged: (value) => setState(() => _teacher = value ?? ''),
+            // Teacher Dropdown with Loading State
+            FutureBuilder<Map<String, int>?>(
+              future: FilterState.allTeachers != null
+                  ? Future.value(FilterState.allTeachers)
+                  : FilterState.fetchAllTeachers(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      labelText: 'Преподаватель (загрузка списка...)',
+                    ),
+                    items: [], // No items while loading
+                    onChanged: null, // Disable interaction
+                  );
+                } else if (snapshot.hasError) {
+                  return DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      labelText: 'Преподаватель (ошибка загрузки)',
+                    ),
+                    items: [], // No items on error
+                    onChanged: null, // Disable interaction
+                  );
+                } else {
+                  final teachers = snapshot.data!;
+                  return DropdownButtonFormField<String>(
+                    value: _teacher.isNotEmpty ? _teacher : null,
+                    decoration: InputDecoration(labelText: 'Преподаватель'),
+                    items: teachers.keys.map((teacherName) {
+                      return DropdownMenuItem(
+                        value: teacherName,
+                        child: Text(teacherName),
+                      );
+                    }).toList(),
+                    onChanged: (value) => setState(() => _teacher = value ?? ''),
+                  );
+                }
+              },
             ),
             SizedBox(height: 24),
             Row(

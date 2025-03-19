@@ -15,20 +15,7 @@ class FilterState {
   DateTime? endDate;
   String sorting = sortingOptions[0];
 
-  FilterState() {
-    _fetchAllFacultiesAndTeachers();
-  }
-
-  Future<void> _fetchAllFacultiesAndTeachers() async {
-    try {
-      allFaculties = await _fetchAllFaculties();
-      allTeachers = await _fetchAllTeachers();
-    } catch (e) {
-      throw Exception('Error fetching data: $e');
-    }
-  }
-
-  Future<Map<String, int>> _fetchAllFaculties() async {
+  static Future<Map<String, int>> fetchAllFaculties() async {
     Map<String, int> facultiesMap = {};
     int page = 1;
 
@@ -50,10 +37,11 @@ class FilterState {
         throw Exception('Failed to load faculties');
       }
     }
+    allFaculties = facultiesMap;
     return facultiesMap;
   }
 
-  Future<Map<String, int>> _fetchAllTeachers() async {
+  static Future<Map<String, int>> fetchAllTeachers() async {
     Map<String, int> teachersMap = {};
     int page = 1;
 
@@ -71,6 +59,7 @@ class FilterState {
         throw Exception('Failed to load teachers');
       }
     }
+    allTeachers = teachersMap;
     return teachersMap;
   }
 
