@@ -14,6 +14,13 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int selectedPage = 0;
 
+  final _navigatorKeys = [
+    GlobalKey<NavigatorState>(),
+    GlobalKey<NavigatorState>(),
+    GlobalKey<NavigatorState>(),
+    GlobalKey<NavigatorState>(),
+  ];
+
   final _pageOptions = [
     FeedPage(),
     TopPage(),
@@ -25,12 +32,18 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: AnimatedSwitcher(
-        duration: Duration(milliseconds: 150), // Animation duration
-        transitionBuilder: (Widget child, Animation<double> animation) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        child: _pageOptions[selectedPage], // The current page
+      body: IndexedStack(
+        index: selectedPage,
+        children: _navigatorKeys.map((key) {
+          return Navigator(
+            key: key,
+            onGenerateRoute: (RouteSettings settings) {
+              return MaterialPageRoute(
+                builder: (context) => _pageOptions[_navigatorKeys.indexOf(key)],
+              );
+            },
+          );
+        }).toList(),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedPage,

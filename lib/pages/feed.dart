@@ -8,7 +8,9 @@ import '../widgets/quote_card.dart';
 import '../widgets/filter_modal.dart';
 
 class FeedPage extends StatefulWidget {
-  const FeedPage({super.key});
+  final FilterState? predefinedFilters;
+
+  const FeedPage({super.key, this.predefinedFilters});
 
   @override
   State<FeedPage> createState() => _FeedPageState();
@@ -25,11 +27,14 @@ class _FeedPageState extends State<FeedPage> {
   static bool _endReached = false; // Whether there are no more quotes to load
   static bool _errorInfiniteScroll = false;
 
-  FilterState _filters = FilterState();
+  late FilterState _filters;
 
   @override
   void initState() {
     super.initState();
+
+    _filters = widget.predefinedFilters ?? FilterState();
+    if (_filters.isFilterApplied()) _onRefresh();
 
     if (_cachedResponse == null) {
       _quoteResponseFuture = _fetchQuotes(

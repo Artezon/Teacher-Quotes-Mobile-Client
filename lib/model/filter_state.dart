@@ -11,6 +11,9 @@ class FilterState {
   String keywords = '';
   String facultyName = 'Все факультеты';
   String teacherName = 'Все преподаватели';
+  // IDs have priority. If they are null, they are derived from names
+  int? facultyId;
+  int? teacherId;
   DateTime? startDate;
   DateTime? endDate;
   String sorting = sortingOptions[0];
@@ -21,10 +24,14 @@ class FilterState {
     int page = 1;
 
     while (true) {
-      final response = await http.get(Uri.parse('$baseUrl$getFaculties?size=100&page=$page&sort_by=name'));
+      final response = await http.get(
+        Uri.parse('$baseUrl$getFaculties?size=100&page=$page&sort_by=name'),
+      );
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(utf8.decode(response.bodyBytes));
-        final faculties = List<Map<String, dynamic>>.from(jsonResponse['faculties']);
+        final faculties = List<Map<String, dynamic>>.from(
+          jsonResponse['faculties'],
+        );
         for (var faculty in faculties) {
           String name = faculty['name'];
           name = name.replaceAll('_', ' ');
@@ -48,10 +55,14 @@ class FilterState {
     int page = 1;
 
     while (true) {
-      final response = await http.get(Uri.parse('$baseUrl$getTeachers?size=100&page=$page&sort_by=fullname'));
+      final response = await http.get(
+        Uri.parse('$baseUrl$getTeachers?size=100&page=$page&sort_by=fullname'),
+      );
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(utf8.decode(response.bodyBytes));
-        final teachers = List<Map<String, dynamic>>.from(jsonResponse['teachers']);
+        final teachers = List<Map<String, dynamic>>.from(
+          jsonResponse['teachers'],
+        );
         for (var teacher in teachers) {
           teachersMap[teacher['fullname']] = teacher['id'];
         }
@@ -67,8 +78,8 @@ class FilterState {
 
   bool isFilterApplied() {
     return keywords != '' ||
-        facultyName != '' ||
-        teacherName != '' ||
+        facultyId != null ||
+        teacherId != null ||
         startDate != null ||
         endDate != null ||
         sorting != sortingOptions[0];
@@ -77,8 +88,14 @@ class FilterState {
   Map<String, String> toQueryParameters() {
     final params = <String, String>{};
     if (keywords.isNotEmpty) params['text'] = keywords;
-    if (facultyName.isNotEmpty && facultyName != 'Все факультеты') params['facultyId'] = allFaculties?[facultyName].toString() ?? '';
-    if (teacherName.isNotEmpty && teacherName != 'Все преподаватели') params['teacherId'] = allTeachers?[teacherName].toString() ?? '';
+    if (facultyName.isNotEmpty && facultyName != 'Все факультеты') {
+      facultyId ??= allFaculties?[facultyName];
+    }
+    if (teacherName.isNotEmpty && teacherName != 'Все преподаватели') {
+      teacherId ??= allTeachers?[teacherName];
+    }
+    if (facultyId != null) params['facultyId'] = facultyId.toString();
+    if (teacherId != null) params['teacherId'] = teacherId.toString();
     if (startDate != null) params['startDate'] = toDateString(startDate!);
     if (endDate != null) params['endDate'] = toDateString(endDate!);
     switch (sorting) {

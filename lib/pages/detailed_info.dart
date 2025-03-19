@@ -2,9 +2,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:mq_mobile_quotes/pages/feed.dart';
 import '../api_data.dart';
 import 'package:flutter/services.dart';
+import '../model/filter_state.dart';
 import '../styles/theme.dart';
+import 'main_page.dart';
 
 enum ContentType { faculty, teacher }
 
@@ -26,6 +29,7 @@ class _DetailedInfoPageState extends State<DetailedInfoPage> {
   late String title;
   bool isLoading = true;
   Map<String, dynamic>? data;
+  String name = '';
 
   @override
   void initState() {
@@ -45,9 +49,7 @@ class _DetailedInfoPageState extends State<DetailedInfoPage> {
   Future<void> _fetchData() async {
     try {
       final response = await http.get(
-        Uri.parse(
-          '$baseUrl$search?${_getQueryParam()}=${widget.id}',
-        ),
+        Uri.parse('$baseUrl$search?${_getQueryParam()}=${widget.id}'),
       );
 
       if (response.statusCode == 200) {
@@ -73,7 +75,7 @@ class _DetailedInfoPageState extends State<DetailedInfoPage> {
             ? 'Информация о факультете'
             : 'Информация о преподавателе';
 
-    String name = data?['name'] ?? 'N/A';
+    name = data?['name'] ?? 'N/A';
     if (widget.contentType == ContentType.faculty) {
       name = name.replaceAll('_', ' ');
       name = "${name[0].toUpperCase()}${name.substring(1)}";
@@ -85,29 +87,28 @@ class _DetailedInfoPageState extends State<DetailedInfoPage> {
       facultiesOrSubjects = _buildListSection(
         'Преподаватели',
         data?['teachers']
-            ?.map<String>((teacher) => (teacher as Map<String, dynamic>)['name'] as String)
-            .toList() ??
+                ?.map<String>(
+                  (teacher) =>
+                      (teacher as Map<String, dynamic>)['name'] as String,
+                )
+                .toList() ??
             [],
       );
     } else {
       facultiesOrSubjects = _buildListSection(
         'Факультеты',
-        data?['faculties']
-            ?.map<String>((faculty) {
+        data?['faculties']?.map<String>((faculty) {
               String name = (faculty as Map<String, dynamic>)['name'] as String;
               name = name.replaceAll('_', ' ');
               name = "${name[0].toUpperCase()}${name.substring(1)}";
               name = name.replaceAll("кубгу", "КубГУ");
               return name;
-            })
-            .toList() ??
+            }).toList() ??
             [],
       );
     }
 
-    String description = data?['description'] ?? 'Нет описания';
-    if (description.isEmpty) description = 'Нет описания';
-
+    String description = data?['description'] ?? '';
 
     return Scaffold(
       appBar: AppBar(title: Text(title)),
@@ -140,17 +141,22 @@ class _DetailedInfoPageState extends State<DetailedInfoPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildInfoSection(
-                            context,
-                            'Описание',
-                            description,
-                          ),
+                          if (description.isNotEmpty)
+                            _buildInfoSection(context, 'Описание', description),
                           facultiesOrSubjects,
                           _buildListSection(
                             'Дисциплины',
                             data?['subjects']
-                                ?.map<String>((subject) => (subject as Map<String, dynamic>)['name'] as String)
-                                .toList() ??
+                                    ?.map<String>(
+                                      (subject) =>
+                                          (subject
+                                                  as Map<
+                                                    String,
+                                                    dynamic
+                                                  >)['name']
+                                              as String,
+                                    )
+                                    .toList() ??
                                 [],
                           ),
                           _buildStatsSection(
@@ -160,7 +166,12 @@ class _DetailedInfoPageState extends State<DetailedInfoPage> {
                           _buildInfoSection(
                             context,
                             'Дата последней публикации',
-                            data?['dateLastPublication']?.toString().split('-').reversed.join('.') ?? 'Неизвестно',
+                            data?['dateLastPublication']
+                                    ?.toString()
+                                    .split('-')
+                                    .reversed
+                                    .join('.') ??
+                                'Неизвестно',
                           ),
                           const SizedBox(height: 24),
                           _buildQuoteButton(context),
@@ -198,13 +209,12 @@ class _DetailedInfoPageState extends State<DetailedInfoPage> {
         children: [
           Text('$title:', style: AppStyles.sectionTitle),
           const SizedBox(height: 8),
-          ...items
-              .map(
-                (item) => Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Text('• $item', style: AppStyles.regularText),
-                ),
-              ),
+          ...items.map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text('• $item', style: AppStyles.regularText),
+            ),
+          ),
         ],
       ),
     );
@@ -249,7 +259,23 @@ class _DetailedInfoPageState extends State<DetailedInfoPage> {
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 16),
         ),
-        onPressed: () => Navigator.pop(context),
+        onPressed: () {
+          final filters = FilterState();
+          if (widget.contentType == ContentType.faculty) {
+            filters.facultyId = widget.id;
+            filters.facultyName = name;
+          } else if (widget.contentType == ContentType.teacher) {
+            filters.teacherId = widget.id;
+            filters.teacherName = name;
+          }
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => FeedPage(predefinedFilters: filters),
+            ),
+          );
+        },
         child: const Text('Перейти к цитатам'),
       ),
     );
