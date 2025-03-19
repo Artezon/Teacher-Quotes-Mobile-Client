@@ -28,9 +28,9 @@ class _QuoteGeneratorPageState extends State<QuoteGeneratorPage> {
 
   int _lastQuoteNumber = 0;
 
-  final List<GeneratedQuote> _generations = [];
+  static final List<GeneratedQuote> _generations = [];
 
-  bool _isTeachersLoaded = false;
+  bool _areTeachersLoaded = false;
   Future<Map<String, int>>? _teachersFuture;
 
   void _generateQuote() {
@@ -60,7 +60,7 @@ class _QuoteGeneratorPageState extends State<QuoteGeneratorPage> {
         : FilterState.fetchAllTeachers();
     _teachersFuture!.then((teachers) {
       setState(() {
-        _isTeachersLoaded = true;
+        _areTeachersLoaded = true;
       });
     });
   }
@@ -130,7 +130,7 @@ class _QuoteGeneratorPageState extends State<QuoteGeneratorPage> {
             // Generate Quote Button (centered and disabled until teachers are loaded)
             Center(
               child: ElevatedButton(
-                onPressed: _isTeachersLoaded ? _generateQuote : null,
+                onPressed: _areTeachersLoaded ? _generateQuote : null,
                 child: Text('Сгенерировать цитату'),
               ),
             ),

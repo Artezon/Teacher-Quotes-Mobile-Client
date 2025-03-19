@@ -8,6 +8,7 @@ class AppStyles {
   );
 
   static ThemeData theme = ThemeData(
+    fontFamily: 'Inter',
     colorScheme: _colorScheme,
     primaryColor: Colors.white,
     appBarTheme: AppBarTheme(

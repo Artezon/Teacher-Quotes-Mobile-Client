@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:share_plus/share_plus.dart';
 import '../model/quote.dart';
 import '../pages/detailed_info.dart';
 
@@ -28,6 +29,17 @@ class QuoteCard extends StatelessWidget {
     return line;
   }
 
+  void _copyToClipboard() {
+    Clipboard.setData(
+      ClipboardData(text: '${data.quote}\n\n© ${data.teacher.fullname}'),
+    );
+    Fluttertoast.showToast(msg: 'Цитата скопирована');
+  }
+
+  void _share() {
+    Share.share('${data.quote}\n\n© ${data.teacher.fullname}');
+  }
+
   @override
   Widget build(BuildContext context) {
     List<String> topText = _formatAuthorSubjectLine();
@@ -43,102 +55,115 @@ class QuoteCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       elevation: 2.0,
       color: Colors.grey[200],
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Faculty • Author • Subject
-            Wrap(
-              // spacing: 5.0,
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                GestureDetector(
-                  child: Text(
-                    topText[0], // Faculty name
-                    style: topTextStyle,
-                  ),
-                  onTap: () {
-                    // Navigate to faculty details
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DetailedInfoPage(
-                          contentType: ContentType.faculty,
-                          id: data.faculty.id,
-                        ),
+                // Faculty • Author • Subject
+                Wrap(
+                  children: [
+                    GestureDetector(
+                      child: Text(
+                        topText[0], // Faculty name
+                        style: topTextStyle,
                       ),
-                    );
-                  },
+                      onTap: () {
+                        // Navigate to faculty details
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => DetailedInfoPage(
+                                  contentType: ContentType.faculty,
+                                  id: data.faculty.id,
+                                ),
+                          ),
+                        );
+                      },
+                    ),
+                    Text(' • ', style: topTextStyle),
+                    GestureDetector(
+                      child: Text(
+                        topText[1], // Teacher name
+                        style: topTextStyle,
+                      ),
+                      onTap: () {
+                        // Navigate to teacher details
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => DetailedInfoPage(
+                                  contentType: ContentType.teacher,
+                                  id: data.teacher.id,
+                                ),
+                          ),
+                        );
+                      },
+                    ),
+                    if (topText.length > 2) Text(' • ', style: topTextStyle),
+                    if (topText.length > 2)
+                      Text(
+                        topText[2], // Subject name
+                        style: topTextStyle,
+                      ),
+                  ],
                 ),
+                const SizedBox(height: 8.0),
+                // Date
                 Text(
-                  ' • ',
-                  style: topTextStyle,
+                  data.datePublication.split('-').reversed.join('.'),
+                  style: TextStyle(color: Colors.grey[600], fontSize: 12.0),
                 ),
+                const SizedBox(height: 8.0),
+                // Quote
                 GestureDetector(
-                  child: Text(
-                    topText[1], // Teacher name
-                    style: topTextStyle,
-                  ),
-                  onTap: () {
-                    // Navigate to teacher details
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DetailedInfoPage(
-                          contentType: ContentType.teacher,
-                          id: data.teacher.id,
-                        ),
-                      ),
-                    );
+                  onLongPress: () {
+                    _copyToClipboard();
+                    HapticFeedback.vibrate();
                   },
+                  child: Text(
+                    data.quote,
+                    style: const TextStyle(fontSize: 16.0),
+                  ),
                 ),
-                if (topText.length > 2)
-                  Text(
-                    ' • ',
-                    style: topTextStyle,
-                  ),
-                if (topText.length > 2)
-                  Text(
-                    topText[2], // Subject name
-                    style: topTextStyle,
-                  ),
+                const SizedBox(height: 8.0),
+                // Reactions and views
+                Row(
+                  children: [
+                    Icon(Icons.star, size: 16.0, color: Colors.amber),
+                    const SizedBox(width: 4.0),
+                    Text(data.reactions.toString()),
+                    const SizedBox(width: 16.0),
+                    Icon(Icons.remove_red_eye, size: 16.0, color: Colors.grey),
+                    const SizedBox(width: 4.0),
+                    Text(data.views.toString()),
+                  ],
+                ),
               ],
             ),
-            const SizedBox(height: 8.0),
-            // Date
-            Text(
-              data.datePublication.split('-').reversed.join('.'),
-              style: TextStyle(color: Colors.grey[600], fontSize: 12.0),
-            ),
-            const SizedBox(height: 8.0),
-            // Quote
-            GestureDetector(
-              onLongPress: () {
-                Clipboard.setData(
-                  ClipboardData(
-                    text: '${data.quote}\n\n© ${data.teacher.fullname}',
-                  ),
-                );
-                Fluttertoast.showToast(msg: 'Цитата скопирована');
-                HapticFeedback.vibrate();
-              },
-              child: Text(data.quote, style: const TextStyle(fontSize: 16.0)),
-            ),
-            const SizedBox(height: 8.0),
-            // Reactions and views
-            Row(
+          ),
+
+          Positioned(
+            bottom: 0.0,
+            right: 0.0,
+            child: Row(
               children: [
-                Icon(Icons.star, size: 16.0, color: Colors.amber),
-                const SizedBox(width: 4.0),
-                Text(data.reactions.toString()),
-                const SizedBox(width: 16.0),
-                Icon(Icons.remove_red_eye, size: 16.0, color: Colors.grey),
-                const SizedBox(width: 4.0),
-                Text(data.views.toString()),
+                IconButton(
+                  icon: Icon(Icons.copy, size: 16.0, color: Colors.grey),
+                  onPressed: _copyToClipboard,
+                ),
+                IconButton(
+                  icon: Icon(Icons.share, size: 16.0, color: Colors.grey),
+                  onPressed: _share,
+                ),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
