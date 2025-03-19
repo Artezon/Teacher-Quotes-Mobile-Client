@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // For Clipboard
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../model/quote.dart';
-import '../pages/detailed_info.dart'; // Import your detailed info page
+import '../pages/detailed_info.dart';
 
 class QuoteCard extends StatelessWidget {
   final Quote data;
@@ -30,7 +30,6 @@ class QuoteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Split the formatted line into parts
     List<String> topText = _formatAuthorSubjectLine();
 
     TextStyle topTextStyle = TextStyle(

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mq_mobile_quotes/pages/quote_generator_page.dart';
+import 'package:mq_mobile_quotes/pages/search_page.dart';
+import 'package:mq_mobile_quotes/pages/top_page.dart';
 import 'feed.dart';
 
 class MainPage extends StatefulWidget {
@@ -13,9 +16,9 @@ class _MainPageState extends State<MainPage> {
 
   final _pageOptions = [
     FeedPage(),
-    FeedPage(),
-    FeedPage(),
-    FeedPage()
+    TopPage(),
+    SearchPage(),
+    QuoteGeneratorPage(),
   ];
 
   @override

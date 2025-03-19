@@ -217,7 +217,7 @@ class _FeedPageState extends State<FeedPage> {
               return Center(
                 child: Builder(
                   builder: (context) {
-                    final no_quotes = Text(
+                    final noQuotes = Text(
                       'Нет цитат',
                       style: TextStyle(
                         fontSize: 24,
@@ -228,7 +228,7 @@ class _FeedPageState extends State<FeedPage> {
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          no_quotes,
+                          noQuotes,
                           SizedBox(height: 16),
                           ElevatedButton(
                             onPressed: _resetFilters,
@@ -237,7 +237,7 @@ class _FeedPageState extends State<FeedPage> {
                         ],
                       );
                     } else {
-                      return no_quotes;
+                      return noQuotes;
                     }
                   },
                 ),
@@ -263,7 +263,7 @@ class _FeedPageState extends State<FeedPage> {
                                 child: Builder(
                                   builder: (context) {
                                     if (_endReached) {
-                                      final all_viewed = Text(
+                                      final allViewed = Text(
                                         'Вы всё посмотрели',
                                         style: TextStyle(
                                           fontSize: 16,
@@ -273,7 +273,7 @@ class _FeedPageState extends State<FeedPage> {
                                       if (_filters.isFilterApplied()) {
                                         return Column(
                                           children: [
-                                            all_viewed,
+                                            allViewed,
                                             SizedBox(height: 16),
                                             ElevatedButton(
                                               onPressed: _resetFilters,
@@ -282,7 +282,7 @@ class _FeedPageState extends State<FeedPage> {
                                           ],
                                         );
                                       } else {
-                                        return all_viewed;
+                                        return allViewed;
                                       }
                                     } else if (_errorInfiniteScroll) {
                                       return ElevatedButton(

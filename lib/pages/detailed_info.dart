@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import '../api_data.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/services.dart';
 import '../styles/theme.dart';
 
@@ -180,7 +179,7 @@ class _DetailedInfoPageState extends State<DetailedInfoPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title + ':', style: AppStyles.sectionTitle),
+          Text('$title:', style: AppStyles.sectionTitle),
           const SizedBox(height: 8),
           GestureDetector(
             onLongPress: () => _copyToClipboard(context, value),
@@ -197,7 +196,7 @@ class _DetailedInfoPageState extends State<DetailedInfoPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title + ':', style: AppStyles.sectionTitle),
+          Text('$title:', style: AppStyles.sectionTitle),
           const SizedBox(height: 8),
           ...items
               .map(
@@ -205,8 +204,7 @@ class _DetailedInfoPageState extends State<DetailedInfoPage> {
                   padding: const EdgeInsets.only(bottom: 4),
                   child: Text('• $item', style: AppStyles.regularText),
                 ),
-              )
-              .toList(),
+              ),
         ],
       ),
     );
