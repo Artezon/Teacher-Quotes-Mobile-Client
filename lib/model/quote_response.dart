@@ -10,9 +10,14 @@ class QuoteResponse {
     var contentList = json['content'] as List;
     List<Quote> quotes = contentList.map((i) => Quote.fromJson(i)).toList();
 
+    Quote? dailyQuote;
+    if (json['dailyQuote'] != null) {
+      dailyQuote = Quote.fromJson(json['dailyQuote']);
+    }
+
     return QuoteResponse(
       content: quotes,
-      dailyQuote: Quote.fromJson(json['dailyQuote']),
+      dailyQuote: dailyQuote,
     );
   }
 }

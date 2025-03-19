@@ -179,16 +179,36 @@ class _FeedPageState extends State<FeedPage> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 10), // Add some spacing between the lines
+                    SizedBox(height: 10),
                     Text(
                       'Не удалось подключиться к серверу :(',
-                      // 'Не удалось подключиться к серверу :(\n${snapshot.error}\n${snapshot.stackTrace}',
                       style: TextStyle(fontSize: 16, color: Colors.grey),
                     ),
-                    SizedBox(height: 20), // Add spacing between text and button
+                    SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: _onRefresh,
                       child: Text('Попробовать ещё раз'),
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      child: Text('Показать сообщение об ошибке'),
+                      onPressed: () => showDialog<void>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Информация'),
+                            content: Text('${snapshot.error}\n${snapshot.stackTrace}'),
+                            actions: [
+                              TextButton(
+                                child: const Text('Закрыть'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),

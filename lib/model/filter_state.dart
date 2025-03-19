@@ -9,14 +9,15 @@ class FilterState {
   static Map<String, int>? allTeachers;
 
   String keywords = '';
-  String facultyName = '';
-  String teacherName = '';
+  String facultyName = 'Все факультеты';
+  String teacherName = 'Все преподаватели';
   DateTime? startDate;
   DateTime? endDate;
   String sorting = sortingOptions[0];
 
   static Future<Map<String, int>> fetchAllFaculties() async {
     Map<String, int> facultiesMap = {};
+    facultiesMap['Все факультеты'] = -1;
     int page = 1;
 
     while (true) {
@@ -43,6 +44,7 @@ class FilterState {
 
   static Future<Map<String, int>> fetchAllTeachers() async {
     Map<String, int> teachersMap = {};
+    teachersMap['Все преподаватели'] = -1;
     int page = 1;
 
     while (true) {
@@ -75,8 +77,8 @@ class FilterState {
   Map<String, String> toQueryParameters() {
     final params = <String, String>{};
     if (keywords.isNotEmpty) params['text'] = keywords;
-    if (facultyName.isNotEmpty) params['facultyId'] = allFaculties?[facultyName].toString() ?? '';
-    if (teacherName.isNotEmpty) params['teacherId'] = allTeachers?[teacherName].toString() ?? '';
+    if (facultyName.isNotEmpty && facultyName != 'Все факультеты') params['facultyId'] = allFaculties?[facultyName].toString() ?? '';
+    if (teacherName.isNotEmpty && teacherName != 'Все преподаватели') params['teacherId'] = allTeachers?[teacherName].toString() ?? '';
     if (startDate != null) params['startDate'] = toDateString(startDate!);
     if (endDate != null) params['endDate'] = toDateString(endDate!);
     switch (sorting) {
