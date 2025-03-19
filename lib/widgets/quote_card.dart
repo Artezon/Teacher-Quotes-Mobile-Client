@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // For Clipboard
 import 'package:fluttertoast/fluttertoast.dart';
 import '../model/quote.dart';
+import '../pages/detailed_info.dart'; // Import your detailed info page
 
 class QuoteCard extends StatelessWidget {
   final Quote data;
@@ -9,7 +10,7 @@ class QuoteCard extends StatelessWidget {
   const QuoteCard({super.key, required this.data});
 
   // Helper function to format the author and subject line
-  String _formatAuthorSubjectLine() {
+  List<String> _formatAuthorSubjectLine() {
     String faculty = data.faculty.name;
     String teacher = data.teacher.fullname;
     String subject = data.subject.name;
@@ -24,11 +25,20 @@ class QuoteCard extends StatelessWidget {
     if (subject.isNotEmpty) {
       line.add(subject);
     }
-    return line.join(' • ');
+    return line;
   }
 
   @override
   Widget build(BuildContext context) {
+    // Split the formatted line into parts
+    List<String> topText = _formatAuthorSubjectLine();
+
+    TextStyle topTextStyle = TextStyle(
+      color: Colors.grey[700],
+      fontSize: 14.0,
+      fontWeight: FontWeight.bold,
+    );
+
     return Card(
       margin: const EdgeInsets.only(bottom: 16.0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
@@ -40,13 +50,60 @@ class QuoteCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Faculty • Author • Subject
-            Text(
-              _formatAuthorSubjectLine(),
-              style: TextStyle(
-                color: Colors.grey[700],
-                fontSize: 14.0,
-                fontWeight: FontWeight.bold,
-              ),
+            Wrap(
+              // spacing: 5.0,
+              children: [
+                GestureDetector(
+                  child: Text(
+                    topText[0], // Faculty name
+                    style: topTextStyle,
+                  ),
+                  onTap: () {
+                    // Navigate to faculty details
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetailedInfoPage(
+                          contentType: ContentType.faculty,
+                          id: data.faculty.id,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                Text(
+                  ' • ',
+                  style: topTextStyle,
+                ),
+                GestureDetector(
+                  child: Text(
+                    topText[1], // Teacher name
+                    style: topTextStyle,
+                  ),
+                  onTap: () {
+                    // Navigate to teacher details
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetailedInfoPage(
+                          contentType: ContentType.teacher,
+                          id: data.teacher.id,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                if (topText.length > 2)
+                  Text(
+                    ' • ',
+                    style: topTextStyle,
+                  ),
+                if (topText.length > 2)
+                  Text(
+                    topText[2], // Subject name
+                    style: topTextStyle,
+                  ),
+              ],
             ),
             const SizedBox(height: 8.0),
             // Date
