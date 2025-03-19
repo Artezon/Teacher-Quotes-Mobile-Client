@@ -12,6 +12,15 @@ class LeaderboardTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (nameColumnTitle == 'Факультет') {
+      data.forEach((value) {
+        String name = value['name'].replaceAll('_', ' ');
+        name = "${name[0].toUpperCase()}${name.substring(1)}";
+        name = name.replaceAll("кубгу", "КубГУ");
+        value['name'] = name;
+      });
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(

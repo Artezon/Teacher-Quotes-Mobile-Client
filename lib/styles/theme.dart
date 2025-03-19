@@ -2,28 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class AppStyles {
-  static final _colorScheme = ColorScheme.fromSeed(
+  static final colorScheme = ColorScheme.fromSeed(
     seedColor: Colors.indigo,
     brightness: Brightness.light,
   );
 
   static ThemeData theme = ThemeData(
     fontFamily: 'Inter',
-    colorScheme: _colorScheme,
+    colorScheme: colorScheme,
     primaryColor: Colors.white,
     appBarTheme: AppBarTheme(
-      backgroundColor: _colorScheme.inversePrimary,
+      backgroundColor: colorScheme.inversePrimary,
       foregroundColor: Colors.black,
       surfaceTintColor: Colors.transparent,
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarBrightness: Brightness.dark,
         statusBarIconBrightness: Brightness.dark,
         statusBarColor: Colors.transparent,
-        systemNavigationBarColor: _colorScheme.surface,
+        systemNavigationBarColor: colorScheme.surface,
       )
     ),
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
-      selectedItemColor: _colorScheme.primary,
+      selectedItemColor: colorScheme.primary,
       unselectedItemColor: Colors.grey,
       type: BottomNavigationBarType.fixed,
     ),

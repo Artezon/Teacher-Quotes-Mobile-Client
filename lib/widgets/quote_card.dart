@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:mq_mobile_quotes/styles/theme.dart';
 import 'package:share_plus/share_plus.dart';
 import '../model/quote.dart';
 import '../pages/detailed_info.dart';
 
 class QuoteCard extends StatelessWidget {
   final Quote data;
+  final bool isDailyQuote;
 
-  const QuoteCard({super.key, required this.data});
+  const QuoteCard({super.key, required this.data, this.isDailyQuote = false});
 
   // Helper function to format the author and subject line
   List<String> _formatAuthorSubjectLine() {
@@ -54,7 +56,10 @@ class QuoteCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16.0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       elevation: 2.0,
-      color: Colors.grey[200],
+      color:
+          isDailyQuote
+              ? Color(0xFFCCD3FF)
+              : Colors.grey[200],
       child: Stack(
         children: [
           Padding(
@@ -110,6 +115,8 @@ class QuoteCard extends StatelessWidget {
                         topText[2], // Subject name
                         style: topTextStyle,
                       ),
+                    if (isDailyQuote)
+                      Text(' • ЦИТАТА ДНЯ!', style: topTextStyle),
                   ],
                 ),
                 const SizedBox(height: 8.0),

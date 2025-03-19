@@ -197,23 +197,26 @@ class _FeedPageState extends State<FeedPage> {
                     SizedBox(height: 20),
                     ElevatedButton(
                       child: Text('Показать сообщение об ошибке'),
-                      onPressed: () => showDialog<void>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text('Информация'),
-                            content: Text('${snapshot.error}\n${snapshot.stackTrace}'),
-                            actions: [
-                              TextButton(
-                                child: const Text('Закрыть'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      ),
+                      onPressed:
+                          () => showDialog<void>(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('Информация'),
+                                content: Text(
+                                  '${snapshot.error}\n${snapshot.stackTrace}',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    child: const Text('Закрыть'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
                     ),
                   ],
                 ),
@@ -260,6 +263,9 @@ class _FeedPageState extends State<FeedPage> {
                           if (index < snapshot.data!.content.length) {
                             return QuoteCard(
                               data: snapshot.data!.content[index],
+                              isDailyQuote:
+                                  snapshot.data!.content[index].id ==
+                                  snapshot.data!.dailyQuote?.id,
                             );
                           } else {
                             return Padding(
