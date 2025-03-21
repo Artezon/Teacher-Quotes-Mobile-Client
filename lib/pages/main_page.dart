@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mq_mobile_quotes/pages/quote_generator_page.dart';
-import 'package:mq_mobile_quotes/pages/top_page.dart';
-import 'package:mq_mobile_quotes/pages/search_page.dart';
+import 'quote_generator_page.dart';
+import 'top_page.dart';
+import 'search_page.dart';
 import 'feed.dart';
 
 class MainPage extends StatefulWidget {

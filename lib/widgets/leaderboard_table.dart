@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/faculty_formatting.dart';
 
 class LeaderboardTable extends StatelessWidget {
   final String nameColumnTitle;
@@ -14,10 +15,7 @@ class LeaderboardTable extends StatelessWidget {
   Widget build(BuildContext context) {
     if (nameColumnTitle == 'Факультет') {
       data.forEach((value) {
-        String name = value['name'].replaceAll('_', ' ');
-        name = "${name[0].toUpperCase()}${name.substring(1)}";
-        name = name.replaceAll("кубгу", "КубГУ");
-        value['name'] = name;
+        value['name'] = formatFaculty(value['name']);
       });
     }
 

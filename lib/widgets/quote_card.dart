@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:mq_mobile_quotes/styles/theme.dart';
 import 'package:share_plus/share_plus.dart';
 import '../model/quote.dart';
 import '../pages/detailed_info.dart';
+import '../utils/faculty_formatting.dart';
 
 class QuoteCard extends StatelessWidget {
   final Quote data;
@@ -18,9 +18,7 @@ class QuoteCard extends StatelessWidget {
     String teacher = data.teacher.fullname;
     String subject = data.subject.name;
 
-    faculty = faculty.replaceAll('_', ' ');
-    faculty = "${faculty[0].toUpperCase()}${faculty.substring(1)}";
-    faculty = faculty.replaceAll("кубгу", "КубГУ");
+    faculty = formatFaculty(faculty);
 
     List<String> line = [];
     line.add(faculty.isNotEmpty ? faculty : 'Неизвестный факультет');

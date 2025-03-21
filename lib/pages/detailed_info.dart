@@ -2,11 +2,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
-import 'package:mq_mobile_quotes/pages/feed.dart';
+import 'feed.dart';
 import '../api_data.dart';
 import 'package:flutter/services.dart';
 import '../model/filter_state.dart';
 import '../styles/theme.dart';
+import '../utils/faculty_formatting.dart';
 
 enum ContentType { faculty, teacher }
 
@@ -76,9 +77,7 @@ class _DetailedInfoPageState extends State<DetailedInfoPage> {
 
     name = data?['name'] ?? 'N/A';
     if (widget.contentType == ContentType.faculty) {
-      name = name.replaceAll('_', ' ');
-      name = "${name[0].toUpperCase()}${name.substring(1)}";
-      name = name.replaceAll("кубгу", "КубГУ");
+      name = formatFaculty(name);
     }
 
     Widget facultiesOrSubjects;
@@ -98,10 +97,7 @@ class _DetailedInfoPageState extends State<DetailedInfoPage> {
         'Факультеты',
         data?['faculties']?.map<String>((faculty) {
               String name = (faculty as Map<String, dynamic>)['name'] as String;
-              name = name.replaceAll('_', ' ');
-              name = "${name[0].toUpperCase()}${name.substring(1)}";
-              name = name.replaceAll("кубгу", "КубГУ");
-              return name;
+              return formatFaculty(name);
             }).toList() ??
             [],
       );

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../api_data.dart';
+import '../utils/faculty_formatting.dart';
 
 class FilterState {
   static final List<String> sortingOptions = ['newest', 'oldest', 'popular'];
@@ -33,10 +34,7 @@ class FilterState {
           jsonResponse['faculties'],
         );
         for (var faculty in faculties) {
-          String name = faculty['name'];
-          name = name.replaceAll('_', ' ');
-          name = "${name[0].toUpperCase()}${name.substring(1)}";
-          name = name.replaceAll("кубгу", "КубГУ");
+          String name = formatFaculty(faculty['name']);
           facultiesMap[name] = faculty['id'];
         }
         if (jsonResponse['totalElements'] <= page * 100) break;
