@@ -19,6 +19,7 @@ class _SearchPageState extends State<SearchPage> {
   Timer? _debounce;
   List<dynamic> _searchResults = [];
   bool _isLoading = false;
+  String lastQuery = '';
 
   @override
   void initState() {
@@ -42,6 +43,9 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Future<void> _performSearch(String query) async {
+    if (query == lastQuery) return;
+    lastQuery = query;
+
     if (query.length < 2) {
       setState(() {
         _searchResults = [];
